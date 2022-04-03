@@ -45,7 +45,7 @@ def shapefile_reader(PATH, fname, shape_name, statefp='17'):
     return final_shape
 
 # retrieving CCAO data
-def ccao_retreiver(API, columns, limit=1869232, year=2014, where='class == 100'):
+def ccao_retriever(API, columns, limit=1869232, year=2014, where='class == 100'):
     client = Socrata('datacatalog.cookcountyil.gov', None)
     if API == 'tnes-dgyi':
         results = client.get(API, year=year, select=columns, limit=limit, where=where)
@@ -106,8 +106,8 @@ nrel_gdf = nrel_concatenator()
 lake_michigan = shapefile_reader(PATH, 'Boundaries - Lake Michigan/ne_10m_lakes.shp', 'Lake Michigan')
 df_cook = shapefile_reader(PATH, 'Boundaries - Cook/cb_2018_us_county_20m.shp', 'Cook')
 df_chicago = shapefile_reader(PATH, 'Boundaries - City/geo_export_7a96e0b9-b9f7-49d7-b280-f703b910b99f.shp', 'CHICAGO')
-results_df = ccao_retreiver('tnes-dgyi', 'pin, year, class')
-loc_df = ccao_retreiver('c49d-89sn', 'pin, mailing_zip, longitude, latitude')
+results_df = ccao_retriever('tnes-dgyi', 'pin, year, class')
+loc_df = ccao_retriever('c49d-89sn', 'pin, mailing_zip, longitude, latitude')
 ccao_gdf = ccao_merger() # this takes a moment to run
 wind_df = wind_merger() # this takes a moment to run
 plot_one(df_cook, ccao_gdf, nrel_gdf, df_chicago)

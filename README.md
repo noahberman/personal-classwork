@@ -1,1 +1,1 @@
-# personal-classwork
+The sample pulls data from the Cook County Assessor's Office and the National Renewable Energy Lab, cleans and merges the data, then maps the distribution of weather monitoring stations and vacant lots across Cook County. The full project goes on to investigate if there is a relationship between a joint variable of a lot's wind speed + vacancy status and the lot's distance to the lake, and then formats and exports the data for use in an interactive map in a Jupyter Notebook.

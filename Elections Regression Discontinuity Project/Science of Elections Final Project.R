@@ -101,26 +101,25 @@ total_clean <- total_clean %>%
   relocate(elec_change_gov_party, .after = govparty_a)
 
 # filtering out -9 (non-major party govs)
-
 total_clean <- total_clean %>%
   filter(elec_change_gov_party != -9)
 
-# Now I'm left with a column (elec_change_gov_party) that tells me if the govs party 
+# Now I'm left with a column (elec_change_gov_party) that tells me if the gov's party 
 # changed in the year previous, and what direction that was. We also still have 
 # years_since_other_party, a count variable saying 1) how many years the Democrats 
-# have been in power (expressed by a positive number) or 2) how many years the 
+# have been in power (expressed by a positive number) or 2) how many years the
 # Republicans have been in power (multiplied by -1). When there has been an independent, 
 # zeros are entered.  
 
 
-# filter for only the years in which governorship changes party -- with this
-# I can find the state house elections following to see what changes in seats occurred
-# this is a list of the data for the years of the elections -- if there is not a house/sen
+# Filter for only the years in which governorship changes party -- with this
+# I can find the state house elections following to see what changes in seats occurred.
+# This is a list of the data for the years of the elections -- if there is not a house/sen
 # election the same year as the gov election, there will be NAs in those columns.
 only_change <- total_clean %>%
   filter(elec_change_gov_party != 2) # intermediate output
 
-# here I read in the gov_sen_house_totals dataset from class in order to get vote totals
+# Now I read in the gov_sen_house_totals dataset from class in order to get vote totals
 # for the governors elections that I find in only_change
 
 govs_votes_raw <- read_csv('/Users/noah/Desktop/Harris/Year 2/Q1/Science of Elections/Final Project polls/gov_sen_house_totals.csv')
@@ -130,8 +129,8 @@ govs_votes_raw <- govs_votes_raw %>%
   filter(year > 1968,
          office == 'G')
 
-# create vote margin column for each state-year pair (which is an election)
-# keep governors name and party, too. Use non-major parties to create
+# Create vote margin column for each state-year pair (which is an election)
+# Keep governors name and party, too. Use non-major parties to create
 # vote margins, then drop them from df.
 govs_votes_raw <- govs_votes_raw %>%
   group_by(state, year) %>%
@@ -144,12 +143,12 @@ govs_votes_raw <- govs_votes_raw %>%
             winner = as.factor(winner)) %>%
   filter(party == 'D' | party == 'R')
 
-# get dem subset
+# Get dem subset
 govs_votes_dem <- govs_votes_raw %>%
   filter(party == 'D')
 
-# crosswalk state names for abbreviations
-# from https://statisticsglobe.com/state-name-abbreviation-r
+# Crosswalk state names for abbreviations
+# From https://statisticsglobe.com/state-name-abbreviation-r
 govs_votes_dem <- govs_votes_dem %>%
   mutate(state = state.name[grep(state, state.abb)])
 
@@ -158,12 +157,12 @@ total_clean_votes_dem <- merge(x = total_clean, y = govs_votes_dem, by = c('stat
 
 sum(is.na(total_clean_votes_dem$winner))
 
-# shrink df to only relevant cols
+# Chrink df to only relevant cols
 graphing_data_dem <- total_clean_votes_dem %>%
   select(year, state, change_house_dem, 
          elec_change_gov_party, govname1, vote_margin, winner)
 
-# vote margins are a year behind because I merged on year not govname - fixing now
+# Vote margins are a year behind because I merged on year not govname - fixing now
 # setting vote_margin equal to itself two spaces prior, to put margin on same line
 # as next election
 
@@ -172,23 +171,21 @@ graphing_data_dem <- graphing_data_dem %>%
   mutate(vote_margin = lag(vote_margin, 2),
          winner = lag(winner, 2))
 
-# checking for NAs - should be about a quarter not NA
+# Checking for NAs - should be about a quarter not NA
 sum(is.na(graphing_data_dem$vote_margin))
 length(graphing_data_dem$vote_margin)
 
 graphing_data_dem <- graphing_data_dem %>%
   drop_na(vote_margin)
 
-# maybe I can actually plot this?
-# subsetting  a reasonably small bandwidth
+# subsetting  a reasonably small bandwidth for plotting
 graphing_data_subset_dem <- graphing_data_dem %>%
   subset(vote_margin < .54 & vote_margin > .46)
-
 
 # checking for NAs in the change column - looks ok
 sum(is.na(graphing_data_subset_dem$change_house_dem))
 length(graphing_data_subset_dem$change_house_dem)
-# 16 NAs out of 160 - leaves me with 144, should be ok
+# 16 NAs out of 160 - leaves me with 144 
 
 # plotting
 ggplot(graphing_data_subset_dem, aes(vote_margin, change_house_dem, color = winner)) +
@@ -207,8 +204,7 @@ ggplot(graphing_data_subset_dem, aes(vote_margin, change_house_dem, color = winn
 
 # Does not appear to be an effect distinguishable from 0
 
-# now we arrange the data for modeling:
-
+# arrange the data for modeling:
 model_data_dem <- graphing_data_subset_dem %>%
   mutate(treat = as.integer(winner),
          cen_vote_margin = vote_margin - .5,
@@ -219,37 +215,37 @@ model_data_dem <- graphing_data_subset_dem %>%
 # cen_vote_margin gives us the slope below the cutoff and inter gives us 
 # the slope above the cutoff.
 
-# first stage is significant
+# First stage is significant
 stargazer(lm(treat ~ above_c, data = model_data_dem), type='text')
 
-# do the 2SLS
+# Do the 2SLS
 stargazer(ivreg(change_house_dem ~ vote_margin | treat,
               data = model_data_dem), title = 'Effects of Dem Candidate Vote Margins on Dem State House Delegation', type = 'text', out = 'fit_dem_basic.html')
 stargazer(ivreg(change_house_dem ~ vote_margin + state | state + treat,
                 data = model_data_dem), title = 'Effects of Dem Candidate Vote Margins on Dem State House Delegation w/ Fixed Effects', omit = 'state', type='text', out = 'fit_dem_fe.html')
 
-# there is not a relationship that can be distinguished from 0 -- for Dems...
+# There is not a relationship that can be distinguished from 0 -- for Dems...
 
 ###======================================================================================
 
-# try again with Reps
+# Try again with Reps
 govs_votes_rep <- govs_votes_raw %>%
   filter(party == 'R')
 
-# crosswalk state names for abbreviations
+# Crosswalk state names for abbreviations
 # from https://statisticsglobe.com/state-name-abbreviation-r
 govs_votes_rep <- govs_votes_rep %>%
   mutate(state = state.name[grep(state, state.abb)])
 
-# now merge everything
+# Now merge everything
 total_clean_votes_rep <- merge(x = total_clean, y = govs_votes_rep, by = c('state', 'year'), all.x = TRUE)
 
-# shrink df to only relevant cols
+# Shrink df to only relevant cols
 graphing_data_rep <- total_clean_votes_rep %>%
   select(year, state, change_house_rep, 
          elec_change_gov_party, govname1, vote_margin, winner)
 
-# vote margins are a year behind because I merged on year not govname - fixing now
+# Vote margins are a year behind because I merged on year not govname - fixing now
 # setting vote_margin equal to itself two spaces prior, to put margin on same line
 # as next election
 
@@ -258,22 +254,21 @@ graphing_data_rep <- graphing_data_rep %>%
   mutate(vote_margin = lag(vote_margin, 2),
          winner = lag(winner, 2))
 
-# checking for NAs - should be about a quarter not NA
+# Checking for NAs - should be about a quarter not NA
 sum(is.na(graphing_data_rep$vote_margin))
 length(graphing_data_rep$vote_margin)
 
 graphing_data <- graphing_data_rep %>%
   drop_na(vote_margin)
 
-# maybe I can actually plot this?
-# subsetting  a reasonably small bandwidth
+# subsetting  a reasonably small bandwidth for plotting
 graphing_data_subset_rep <- graphing_data_rep %>%
   subset(vote_margin < .54 & vote_margin > .46) 
 
-# how many nas...
+# Checking how many nas
 sum(is.na(graphing_data_subset_rep$change_house_rep))
 length(graphing_data_subset_rep$change_house_rep)
-# missing 17 out of 200 -- leaves me with 183, fine
+# missing 17 out of 200 -- leaves me with 183, which is doable
 
 ggplot(graphing_data_subset_rep, aes(vote_margin, change_house_rep, color = winner)) +
   geom_point() + 
@@ -288,10 +283,9 @@ ggplot(graphing_data_subset_rep, aes(vote_margin, change_house_rep, color = winn
                         l = 65, name="Winner or\nLoser",
                         breaks=c("0", "1"), labels=c("Loser", "Winner")) +
 theme(plot.title = element_text(hjust = 0.5))
+# There doesn't seem to be any effect
 
-# Doesn't seem to be any effect
-
-# now we arrange the data for modeling:
+# Arrange the data for modeling:
 model_data_rep <- graphing_data_subset_rep %>%
   mutate(treat = as.integer(winner),
          cen_vote_margin = vote_margin - .5, 

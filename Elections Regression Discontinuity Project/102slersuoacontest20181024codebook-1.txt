@@ -1,0 +1,284 @@
+Codebook for file 110slersforuse20181024.csv
+
+Unlike SLERs, this dataset is set up so that the unit of analysis is an election, instead of a candidate.
+In other words, one row has the information for one election.  In SLERs, one row had the information for one candidate in an election.
+
+Also, almost all of the elections that weren't general elections were dropped from this dataset.  The only non-general elections that appear here are those that followed a general election that had no candidtates (for example, because the sole candidate in an election died and they were not replaced) or were otherwise invalidated.  
+
+VARIABLE LIST
+
+year
+	Four digit year in which election takes place.  
+
+state
+	Name of state
+
+The following variables have the same names and definitions as the variables with the same name in the SLERs database.  See SLERs codebook.  
+
+sid
+sfips
+sab	State Abbreviation
+sen
+dname
+dno
+geopost
+mmdpost
+specpost
+dtype
+dseats	Number of Seats in District
+popnum 
+redist
+redist1
+redist2
+redist3
+regime
+nest 	Number of House Districts Nested Inside a Senate District
+nest1 
+nest2 
+nest3 
+etype 
+deter
+eseats	Number of Seats Up for Election
+firstcase 
+
+CHAMBER LEVEL VARIABLES
+seatsup
+	Number of seats up in election.  
+
+totalseats
+	Total seats in the state legislative chamber.  
+	Source: external to SLERs / Klarner Dataverse Partisan Balance Dataset.
+
+propup
+	seatsup / totalseats
+
+PREFIXES
+In the following section, variable name components have one of the three following prefixes: "d" (for "Democrat"), "r" (for "Republican") or "o" (for "other party" / an independent candidate or third party).  Many variables do not have the "o" prefix, as that prefix would be inappropriate for those variables.  The suffixes mean the following.
+
+dvote
+rvote
+ovote
+	Number of votes
+
+dcand
+rcand
+ocand
+	Number of candidates, divided by eseats.
+	WARNING: this variable has the same name as a variable in SLERs, but is a different variable.  
+
+dwin
+rwin
+owin
+	Number of winners, divided by eseats.
+
+dinc
+rinc
+oinc
+	Number of incumbents, divided by eseats.
+
+dinc2
+rinc2
+oinc2
+	Number of incumbents who have served in that legislative chamber between 4 and 7 years (continuously) before the election, divided by eseats.  
+
+dinc3
+rinc3
+oinc3
+	Number of incumbents who have served in that legislative chamber for 8 or more years (continuously) before the election, divided by eseats.  
+
+dother
+rother
+oother
+	Number of candidates who served in the other chamber of the legislature immediately before the election, divided by eseats.
+
+dleg2
+rleg2
+oleg2
+	Number of candidates who have served in the legislature (in either chamber) between 4 and 7 years (continuously) before the election, divided by eseats.  
+
+dleg3
+rleg3
+oleg3
+	Number of candidates who have served in the legislature (in either chamber) for 8 or more years (continuously) before the election, divided by eseats.  
+
+dpast
+rpast
+opast
+	Number of candidates who served in the legislature in the past, but not the immediate past, divided by eseats.  
+
+dswitch
+rswitch
+	Number of candidates who switched from one major party to the other, divided by eseats.  
+	The prefix indicates that the candidate switched to the party represented by the prefix.
+
+dswitchwin
+rswitchwin
+	Number of candidates who won their last election (but only if it was four years or less in the past) who switched from one major party to the other, divided by eseats.  
+	The prefix indicates that the candidate switched to the party represented by the prefix.
+
+dstealth
+rstealth
+	Number of candidates who switched from a major party to a non-major party (such as switching to an independent or other third party), divided by eseats.  
+	The prefix indicates that the candidate switched from the party represented by the prefix.
+
+dstealthwin
+rstealthwin
+	Number of candidates who switched from a major party to a non-major party (such as switching to an independent or other third party), who won their last election (but only if it was four years or less in the past), divided by eseats.  
+	The prefix indicates that the candidate switched from the party represented by the prefix.
+
+SAMPLE SELECTION VARIABLES
+
+dontuse
+	Dummy: 1 = consider not using this election, it has key variables missing values.  0 = else.
+	DESCRIPTIVES: coded "1" for 1.65% of cases.  Furthermore, there are concentrations of these cases in some state-years, such as 1986, 1988 and 1990 North Carolina elections.  
+	Missing values for the following variables resulted in a score of "1" for this variable. 
+	incompleteelect: this is the most common.  It means that only the winner of the election in question is reported.  
+	party (uncertainty about the type of non-major party a candidate was wouldn't result in dontuse being coded to "1")
+	eseats
+	etype
+	outcome
+	writeinstatus unknown
+	generalproblem
+	identity: there is uncertainty about the identity of at least one candidate in the election, and this might influence the coding of incumbency.  
+	day
+	vote
+	Note: some uses for these data may not require excluding cases as a result of some of the problems mentioned above.  
+	Note: Many variables are not computed accurately for cases where dontuse is equal to "1," and no effort was made to change all variables to system missing if this variable is coded "1."  Use cases coded "1" for this variable with extreme caution.  
+
+votemiss
+	Dummy: 1 = no votes reported, 0 = else.  
+	The most common reason for votes not being reported is that the state in question does not put uncontested elections on the ballot (see SLERs codebook for list).  When elections are uncontested in such states, dper is still given a value (i.e., either 0 or 100% Democratic vote share, see description of "dper" below), but raw votes are left system missing.  When votemiss is "1" and the election is not in such a state and/or is not uncontested, the variable "dontuse" is coded "1".  
+
+bigthird
+	Code indicating whether there is a large non-major party presense in contest.  
+	1 = non-major party candidates collectively received 20% or more of the vote.
+	2 = either at least one non-major party candidate won the election, or at least one non-major party candidate had prior legislative experience (such as being an incumbent, serving in the other chamber, or serving in the state legislature sometime in the past).
+	0 = else
+	Note: the percentage of the total vote obtained by non-major party candidates was multiplied by the number of seats up for election in the contest (i.e., eseats) when ascertaining whether the vote was greater than the percentage threshold.  For example, a non-major party candidate receiving 6.68% of the total vote in a three seat contest would be considered to be above the 20% threshold.  This is as it should be.  
+	DESCRIPTIVES: score of "2" for .57% of cases.  Score of "1" for another .33% of cases.  99.10% of cases do not see a large non-major party presence given the criteria adopted here.  
+	Note: consider not using these elections in an analysis.  
+
+mixeduncont 
+	Dummy: 1 = if you add the number of Republican candidates to the number of Democratic candidates, the resulting total equals the number of seats to be won in the election.  0 = else. 
+	DESCRIPTIVES: There are 228 contests with a score of "1" for this variable.  
+
+partuncont 
+	Dummy: 1 = both major parties had at least one candidate in the election, but at least one major party didn't have as many candidates as there were seats to be won.  0 = else.  
+	Note: The variable "eseats" must be "2" or greater for this variable to be coded "1."
+	Note: The variable "uncont" is coded "0" when this variable is coded "1" and vice versa.
+
+uncont 
+	Dummy: 1 = predetermined in advance of the election how many Republicans and Democrats will win in the election because of lack of contestation.  0 = else.
+	Note: a score of "1" usually occurs because one major party has zero candidates, although the rare eventuality of a score of "1" for the variable "mixeduncont" also results in a "1" for this variable.  See description of the variable "mixeduncont" below.  
+
+VOTESHARE
+dper 
+	Percent of the two-party vote going to the Democratic candidates running in a contest.
+
+PROPORTION VARIABLES
+The following operation is done on the variables with suffixes from above that match the variables listed here in for the following operation.  The Democratic proportion from above is subtracted by the Republican proportion.  
+EXAMPLE: Say there is a two seat FFA-MMD, with one Democratic incumbent running, and one Republican incumbent running.  The Democratic proportion would be computed as 1/2 = .5.  The Republican proportion would be computed as 1/2 = .5.  The final score would then be computed as .5 - .5 = 0.    
+EXAMPLE #2 (more common): A single-member district has one Republican and one Democratic candidate.  The Republican is an incumbent.  So 0/1 for the Dem = 0.  1/1 for the Repub = 1.  The final score would then be computed as 0 - 1 = -1.  
+Generally, negative values mean a Republican advantage, positive values mean a Democratic advantage.  
+
+cand 
+inc 
+inc2 
+inc3 
+other 
+leg2 
+leg3 
+past 
+switch 
+switchwin 
+stealth 
+stealthwin 
+
+
+
+TERM LENGTH VARIABLES
+maxtermz
+	Actual length of term that the candidate who won this election is being elected to.  
+	Rarely, in FFA-MMDs, within one contest, term lengths for different winners are different from each other.  The "max" associated with this variable indicates that this is the longer of those terms when actual term lengths vary.  
+	Descriptives: only 18 seats have such variation.  
+
+mintermz
+	Actual length of term that the candidate who won this election is being elected to.  
+	Rarely, in FFA-MMDs, within one contest, term lengths for different winners are different from each other.  The "min" associated with this variable indicates that this is the shorter of those terms when actual term lengths vary.  
+	Descriptives: only 18 seats have such variation.  
+
+maxweight
+	This variable represents the number of seats in an FFA-MMD that have the longer term length when there is variation in the length of actual terms, or it gives the number of seats in a contest if there is no variation.  
+	Descriptives: only 18 seats have such variation.  
+
+minweight
+	This variable represents the number of seats in an FFA-MMD that have the shorter term length when there is variation in the length of actual terms, or it has "0" when a contest has no such variation.  
+	Descriptives: only 18 seats have such variation.  
+
+
+
+LAGGED VARIABLES
+
+These are the same as above, except that they are measured in the election that occurred before the election in question.  
+
+When redistricting has occurred since the last time a seat was up, the value is generally changed to missing / blank.  There are two exceptions to this rule.  
+
+The first is if redistricting has generally happened chamber wide, but specific districts haven't been redrawn.  Sometimes when districts aren't re-drawn, they also have their district designations change.  For any such district that hasn't been redrawn, lagged values still appear.  
+
+The second instance that will see a redistricted case not be system missing is if all seats in a chamber have been accounted for (whether up two or four years ago) and there is no variation in a lagged value among all the contests in that group.  Unfortunately, the variables this is more apt to be possible for (say, are generally much less important than other variables (such as lagged vote share).  
+
+propuplag
+dperlag 
+dwinlag
+dvotelag
+rvotelag
+ovotelag
+candlag 
+inclag 
+inc2lag 
+inc3lag 
+otherlag 
+leg2lag 
+leg3lag 
+pastlag 
+switchlag 
+switchwinlag 
+stealthlag 
+stealthwinlag 
+dontuselag 
+bigthirdlag 
+mixeduncontlag 
+partuncontlag 
+uncontlag 
+
+LAGGED VARIABLES NOT FROM ABOVE
+
+incuncontlag
+	Interaction between inclag and uncontlag.  
+
+otheruncontlag
+	Interaction between otherlag and uncontlag.  
+
+pastuncontlag
+	Interaction between otherlag and uncontlag.  
+
+lagyearmin
+	This is the election year that the lagged value is from.  
+	Very rarely, two prior election years will contribute to the lagged values of one election.  In that case, this variable reports the earlier of those to years.  If it is not the case, the prior election year is reported.  
+
+lagyearmax
+	This is the election year that the lagged value is from.  
+	Very rarely, two prior election years will contribute to the lagged values of one election.  In that case, this variable reports the later of those to years.  If it is not the case, the prior election year is reported.  
+
+minweightlag
+	This variable represents the number of seats that generated the lagged values a contest has.  
+	Very rarely, two prior election years will contribute to the lagged values of one election.  In that case, this variable reports the number of seats from the earlier of those two years.  If it is not the case, the total number of seats from the single lagged contest from the past is reported.  
+
+maxweightlag
+	This variable represents the number of seats that generated the lagged values a contest has.  
+	Very rarely, two prior election years will contribute to the lagged values of one election.  In that case, this variable reports the number of seats from the later of those two years.  If it is not the case, the total number of seats from the single lagged contest from the past is reported.  
+
+
+
+
+
